@@ -4,6 +4,8 @@ package org.example.Base;
 //  Base Test Father -> Testcase - Son - Single Inheritance
 
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.example.Asserts.AssertActions;
 import org.example.Endpoints.APIConstants;
 import io.restassured.builder.RequestSpecBuilder;
@@ -31,7 +33,7 @@ public class BaseTest {
         assertActions = new AssertActions();
         requestSpecification = new RequestSpecBuilder()
                 .setBaseUri(APIConstants.BASE_URL)
-                .addHeader("Content-Type","application/json")
+                .addHeader("Content-Type", "application/json")
                 .build().log().all();
 
 //        requestSpecification = RestAssured.
@@ -39,8 +41,26 @@ public class BaseTest {
 //                .baseUri(APIConstants.BASE_URL)
 //                .contentType(ContentType.JSON)
 //                .log().all();
+    }
+        public String getToken () {
+            requestSpecification = RestAssured
+                    .given()
+                    .baseUri(APIConstants.BASE_URL)
+                    .basePath(APIConstants.AUTH_URL);
+
+            // Setting the payload
+            String payload = payloadManager.setAuthPayload();
+
+            // Get the Token
+            response = requestSpecification.contentType(ContentType.JSON).body(payload).when().post();
+
+            // String Extraction
+            String token = payloadManager.getTokenFromJSON(response.asString());
+
+            return token;
 
 
 
     }
+
 }

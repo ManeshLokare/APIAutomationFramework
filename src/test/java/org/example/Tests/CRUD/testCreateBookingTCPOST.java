@@ -5,6 +5,7 @@ import org.example.Endpoints.APIConstants;
 import org.example.POJOS.BookingResponse;
 import io.qameta.allure.*;
 import io.restassured.RestAssured;
+import org.example.Utils.PropertyReader;
 import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
 import static org.assertj.core.api.Assertions.*;
@@ -25,11 +26,11 @@ public class testCreateBookingTCPOST extends BaseTest {
         response = RestAssured.given(requestSpecification)
                 .when().body(payloadManager.createPayloadBookingAsString()).post();
         validatableResponse = response.then().log().all();
-        validatableResponse.statusCode(200);
+        validatableResponse.statusCode(Integer.parseInt(PropertyReader.readKey("booking.post.statuscode.success")));
 
 
         //Default Rest Assured
-        validatableResponse.body("booking.firstname", Matchers.equalTo("James"));
+        validatableResponse.body("booking.firstname", Matchers.equalTo(PropertyReader.readKey("booking.post.firstname")));
 
 
         BookingResponse bookingResponse = payloadManager.bookingResponseJava(response.asString());
@@ -37,9 +38,10 @@ public class testCreateBookingTCPOST extends BaseTest {
         // AssertJ
         assertThat(bookingResponse.getBookingid()).isNotNull();
         assertThat(bookingResponse.getBooking().getFirstname()).isNotNull().isNotBlank();
-        assertThat(bookingResponse.getBooking().getFirstname()).isEqualTo("James");
+        assertThat(bookingResponse.getBooking().getFirstname()).isEqualTo(PropertyReader.readKey("booking.post.firstname"));
+
 
         // TestNG Assertions
-        assertActions.verifyStatusCode(response,200);
+        assertActions.verifyStatusCode(response,(Integer.parseInt(PropertyReader.readKey("booking.post.statuscode.success"))));
     }
 }
